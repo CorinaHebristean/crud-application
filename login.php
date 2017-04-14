@@ -19,6 +19,7 @@ if(isset($_POST["submit"])){
     if($user){
         $_SESSION["logged_in"] = 1;
         $_SESSION["username"] = $user["username"];
+        $_SESSION["user_id"] = $user["id"];
     } else {
         $_SESSION['message'] = 'Bad credentials';
     }

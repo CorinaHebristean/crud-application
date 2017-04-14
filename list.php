@@ -2,6 +2,8 @@
 
 require_once "dbconfig.php";
 
+$user_id = $_SESSION["user_id"];
+
 $sql = "SELECT * FROM users";
 
 $stmt = $conn->prepare($sql);
@@ -9,6 +11,16 @@ $stmt = $conn->prepare($sql);
 $stmt->execute();
 
 $users = $stmt -> fetchAll();
+
+
+function check_authentication() {
+    if ( isset($_SESSION['logged_in']) && $_SESSION["logged_in"] == 1) {
+
+        return true;
+    }
+
+    return false;
+}
 
 if(isset($_SESSION["message"])){
     echo "<p>" . $_SESSION["message"] . "</p>";
@@ -21,10 +33,17 @@ if (isset($_SESSION['logged_in'])) {
 } else {
     echo "<a href='login_form.php'>Login</a>";
 }
+
+
+
 ?>
 
 <p>
 <a href="register_form.php">Register users</a>
+</p>
+
+<p>
+<a href="update_form.php?id=<?php echo $user_id ?>" >Edit my profile</a>
 </p>
 
 <table border=1>
@@ -32,9 +51,13 @@ if (isset($_SESSION['logged_in'])) {
         <th>ID</th>
         <th>Username</th>
         <th>Email</th>
-        <th>Password</th>
+        <?php if ( check_authentication()): ?>
+            <th>Password</th>
+        <?php endif; ?>
         <th>City</th>
-        <th>Actions</th>
+        <?php if ( check_authentication()): ?>
+            <th>Actions</th>
+        <?php endif; ?>
     </tr>
 
     <?php foreach ($users as $user): ?>
@@ -42,14 +65,20 @@ if (isset($_SESSION['logged_in'])) {
         <td><?php echo $user["id"] ?></td>
         <td><?php echo $user["username"] ?></td>
         <td><?php echo $user["email"] ?></td>
-        <td><?php echo $user["password"] ?></td>
+        <?php if ( check_authentication()): ?>
+            <td><?php echo $user["password"] ?></td>
+        <?php endif; ?>
+
         <td><?php echo $user["city"] ?></td>
+
+        <?php if ( check_authentication()): ?>
         <td>
             <a href="update_form.php?id=<?php echo $user["id"] ?>">Edit</a>
             <a href="delete.php?id=<?php echo $user["id"] ?>"
                 onclick="if (!window.confirm('Are you sure?')) return false;"
                >Delete</a>
         </td>
+        <?php endif; ?>
     </tr>
 
     <?php endforeach ?>
